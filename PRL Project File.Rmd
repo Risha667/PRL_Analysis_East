@@ -1,0 +1,297 @@
+---
+title: "Cap Week 10 Classwork"
+author: "Risha Alam"
+date: "2024-03-11"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Load tidyverse
+```{r}
+library(tidyverse)
+```
+Set Working Directory
+```{r}
+setwd("C:/Users/hp/OneDrive/Desktop/SNHU/3rd Semester/QSO 705/Week 7")
+getwd()
+```
+```{r}
+mpg1=mpg 
+mpg1
+```
+Import data files
+```{r}
+mpg1<-read.csv("mpg1.csv")
+mpg1
+```
+Simple Bar Chart
+```{r}
+ggplot(mpg1)+geom_bar(aes(x=reorder(class,-table(class)[class]),fill=class))+labs(x="class",title="Number of Cars by Class")+theme(legend.position = "none")+theme(plot.title = element_text(size=14,face='bold',color="blue",hjust=0.5))
+```
+Import PRL Project Data
+```{r}
+WPhysicians<-read.csv("PRL West Physicians Final 2024-03.csv")
+colnames(WPhysicians)
+```
+Number of Physicians by State ggplot(WPhysicians)+geom_bar(aes(x=Industry,fill=Ownership_Type))+coord_flip()+theme(legend.position = "none")
+Stacked Bar Chart of Number of Physicians by Industry by Ownership type
+ggplot(WPhysicians)+geom_bar(aes(x=Industry,fill=Ownership_Type))+coord_flip()
+```{r}
+
+```
+
+
+```{r}
+ggplot(WPhysicians)+geom_bar(aes(x=Industry,fill=Ownership_Type))+coord_flip()+labs(title="Number of West Physicians by Industry by Ownership Type")+theme(plot.title=element_text(size=12,face="bold",color="blue",hjust=0.5))+labs(fill="Ownership Type")
+```
+Import PRL Project East file
+```{r}
+EPhysicians<-read.csv("PRL East Physicians Final 2024-03.csv")
+colnames(EPhysicians)
+```
+Stacked Bar
+```{r}
+ggplot(EPhysicians)+geom_bar(aes(x=Industry,fill=Ownership_Type))+coord_flip()+labs(title="Number of East Physicians by Industry by Ownership Type")+theme(plot.title=element_text(size=12,face="bold",color="blue",hjust=0.5))+labs(fill="Ownership Type")
+```
+Another Stacked Bar
+```{r}
+ggplot(EPhysicians) +geom_bar(aes(x = Industry, fill = Entity_Type)) + coord_flip() +labs(title = "Number of East Physicians by Industry by Entity Type",fill = "Entity Type") + theme(plot.title = element_text(size = 12, face = "bold", color = "blue", hjust = 0.5))
+```
+Stacked Bar Chart: Number of Physicians by Ownership Type in Each State
+```{r}
+top_10_states <- EPhysicians %>%
+  group_by(State) %>%
+  summarize(total_physicians = n()) %>%
+  top_n(10, total_physicians) %>%
+pull(State)
+
+# Filter the data to include only the top 10 states
+EPhysicians_top10 <- EPhysicians %>%
+filter(State %in% top_10_states)
+
+# Create the stacked bar chart
+ggplot(EPhysicians_top10, aes(x =State,fill = Ownership_Type)) +
+  geom_bar() +
+  labs(title = "Number of Physicians by Ownership Type in Top Ten States",
+       x = "State",
+       fill = "Ownership Type") +
+  theme(axis.text.x = element_text(hjust = 1),
+        legend.position = "bottom")+theme(plot.title=element_text(size=12,face="bold",color="blue",hjust=0.5))+coord_flip()
+```
+Pie Chart: Distribution of Physicians by Industry
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Aggregate the data by Industry
+industry_counts <- EPhysicians %>%
+  count(Industry)
+
+# Create the stacked polar bar chart with data labels and legend on the right side
+ggplot(industry_counts, aes(x = "", y = n, fill = Industry, label = n)) +
+  geom_bar(width = 1, stat = "identity") +
+  geom_text(aes(label = n, position = position_stack(vjust = 0.5), color = "white", size = 3) +
+  coord_polar("y", start = 0) +
+  labs(title = "Distribution of Physicians by Industry", fill = "Industry") +
+  theme_void() +
+  theme(legend.position = "right") # Place legend on the right side of the chart
+```
+Bar Chart: Total Number of Physicians by State
+
+```{r}
+# Create the bar chart for the top 10 states with data labels and pink bars
+ggplot(EPhysicians_top10, aes(x = State)) +
+  geom_bar(fill = "pink") +  # Specify fill color
+  geom_text(aes(label = stat(count)), vjust = -0.5, color = "black", size = 3, stat = "count") +
+  labs(title = "Total Number of Physicians by Top Ten States",
+      x = "State",
+      y = "Number of Physicians") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+theme(plot.title=element_text(size=12,face="bold",color="blue",hjust=0.5))
+
+
+```
+Column Chart - Total Revenue by Industry
+```{r}
+# Column chart to visualize total revenue by industry
+ggplot(ECompanies, aes(x = Industry, y = Revenue_Millions)) +
+  geom_col(fill = "skyblue") + coord_flip()+
+  labs(title = "Total Revenue by Industry", x = "Industry", y = "Total Revenue (Millions)") +
+  theme(axis.text.x = element_text(hjust = 1))
+
+```
+```{r}
+ECompanies<-read.csv("PRL East Companies Final 2024-03.csv")
+colnames(ECompanies)
+```
+```{r}
+library(ggplot2)
+
+# Summarize total revenue by industry
+revenue_by_industry <- aggregate(Revenue_Millions ~ Industry, data = ECompanies, FUN = sum)
+
+# Order industries by total revenue in descending order
+revenue_by_industry <- revenue_by_industry[order(-revenue_by_industry$Revenue_Millions), ]
+
+# Reorder the levels of Industry based on total revenue
+ECompanies$Industry <- factor(ECompanies$Industry, levels = revenue_by_industry$Industry)
+
+# Plot the column chart
+ggplot(ECompanies, aes(x = Industry, y = Revenue_Millions)) +
+  geom_col(fill = "skyblue") +
+  labs(title = "Total Revenue by Industry", x = "Industry", y = "Total Revenue (Millions)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+Bar Chart - Count of Companies by State:
+```{r}
+library(ggplot2)
+
+# Bar chart to visualize the count of companies by state
+ggplot(ECompanies, aes(x = State)) +
+  geom_bar(fill = "skyblue") +
+  labs(title = "Count of Companies by State", x = "State", y = "Count of Companies") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r}
+library(ggplot2)
+
+# Summarize count of companies by state
+company_count_by_state <- table(ECompanies$State)
+
+# Order states by count in descending order
+states_descending <- names(sort(company_count_by_state, decreasing = TRUE))
+
+# Reorder the levels of State based on count of companies
+ECompanies$State <- factor(ECompanies$State, levels = states_descending)
+
+# Plot the bar chart
+ggplot(ECompanies, aes(x = State)) +
+  geom_bar(fill = "pink") +
+  labs(title = "Count of Companies by State", x = "State", y = "Count of Companies") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+theme(plot.title=element_text(size=12,face="bold",color="blue",hjust=0.5))
+
+```
+Pie Chart - Distribution of Companies by Entity Type:
+```{r}
+library(ggplot2)
+
+# Count the number of companies by entity type
+entity_counts <- table(ECompanies$Entity_Type)
+
+# Convert the counts to a data frame
+entity_counts_df <- as.data.frame(entity_counts)
+
+# Plot the pie chart with data labels
+ggplot(data = entity_counts_df, aes(x = "", y = Freq, fill = Var1)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start = 0) +
+  labs(title = "Distribution of Companies by Entity Type", fill = "Entity Type") +
+  theme_void() +
+  geom_text(aes(label = Freq), color = "white", position = position_stack(vjust = 0.5))
+
+
+```
+Stacked Bar Chart - Count of Companies by Industry and Ownership Type:
+```{r}
+# Stacked bar chart to visualize the count of companies by industry and ownership type
+ggplot(ECompanies, aes(x = Industry, fill = Ownership_Type)) +
+  geom_bar() +coord_flip()+
+  labs(title = "Count of Companies by Industry and Ownership Type", x = "Industry", fill = "Ownership Type") +
+  theme(axis.text.x = element_text(hjust = 1))
+
+```
+Bubble chart
+```{r}
+library(ggplot2)
+
+# Assuming your dataset is named ECompanies and contains columns for Revenue, Profit, and Industry
+
+# Create the bubble chart with custom bubble color
+ggplot(ECompanies, aes(x = Revenue_Millions, y = Profit_Millions, size = Number_Physicians)) +
+  geom_point(alpha = 0.7, color = "skyblue") +  # Change bubble outline color to skyblue
+  scale_size(range = c(3, 15)) +  # Adjust the range of bubble sizes as needed
+  labs(title = "Bubble Chart of Revenue vs. Profit by Industry",
+       x = "Revenue (Millions)",
+       y = "Profit (Millions)",
+       size = "Number of Physicians") +
+  theme_minimal()
+
+```
+```{r}
+library(ggplot2)
+library(tidyverse)
+
+# Assuming your dataset is named ECompanies and contains numeric variables for analysis
+# Select relevant numeric variables for correlation analysis
+numeric_vars <- ECompanies %>%
+  select_if(is.numeric)
+
+# Calculate the correlation matrix
+correlation_matrix <- cor(numeric_vars)
+
+# Melt the correlation matrix for plotting
+melted_correlation <- as.data.frame(as.table(correlation_matrix))
+names(melted_correlation) <- c("Var1", "Var2", "value")
+
+# Create the heatmap
+ggplot(melted_correlation, aes(Var1, Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "blue", high = "red") +
+  labs(title = "Heatmap of Correlation Between Variables",
+       x = "Variables", y = "Variables") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+Histogram
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Assuming your dataset is named ECompanies and contains numeric variables for analysis
+# Select relevant numeric variables for correlation analysis
+numeric_vars <- ECompanies %>%
+  select_if(is.numeric)
+
+# Calculate the correlation matrix
+correlation_matrix <- cor(numeric_vars)
+
+# Melt the correlation matrix for plotting
+melted_correlation <- as.data.frame(as.table(correlation_matrix))
+names(melted_correlation) <- c("Variable1", "Variable2", "Correlation")
+
+# Create the heatmap
+ggplot(melted_correlation, aes(Variable1, Variable2, fill = Correlation)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,
+                       name = "Correlation", limits = c(-1, 1)) +
+  labs(title = "Heatmap of Correlation Between Variables",
+       x = "Variables", y = "Variables") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
